@@ -5,7 +5,10 @@ __lua__
 -- by murilo and jonathan
 
 characters = {}
+cops = {}
+
 game_over = false
+welcome = true
 
 empty = 0
 platform = 1
@@ -33,25 +36,38 @@ function new_character(player_number, sprite, x, y, dx, dy)
 end
 
 
+
+
 function _init()
 	p1 = new_character(1, emma, 2.4, 3.5, 0, 0)
+	--p2 = new_character(2, 3, 2.4, 6.5, 0, 0)
 	cop1 = new_character(0, cop, 8.4, 3.5, 0.06, 0)
+	cop2 = new_character(0, cop, 4.4, 6.5, -0.06, 0)
+	cop3 = new_character(0, cop, 6.4, 9.5, -0.06, 0)
+	add(cops, cop1)
+	add(cops, cop2)
+	add(cops, cop3)
 end
 
-function control_player(player)
+function control_player(player, nr)
+	local offset = 0
+	if nr == 2 then
+		offset = 8
+	end
+
 	player.dx = 0
-	if (btn(0)) then 
+	if (btn(0 + offset)) then 
 		player.dx -= player.speed
-	elseif(btn(1)) then 
+	elseif(btn(1 + offset)) then 
 		player.dx += player.speed
 	else
 		player.dx = 0
 	end
 	
 	player.dy = 0
-	if (btn(2)) then 
+	if (btn(2 + offset)) then 
 		player.dy -= player.speed
-	elseif(btn(3)) then 
+	elseif(btn(3 + offset)) then 
 		player.dy += player.speed
 	else
 		player.dy = 0
@@ -116,21 +132,28 @@ function move_cop(cop)
 		cop.x += cop.dx
 end
 
-function check_bust(player, cop)
-	if(abs(player.x - cop.x) < player.width + cop.width and 
-	   abs(player.y - cop.y) < player.height + cop.height)then
+function check_bust_p1(cop)
+	if(abs(p1.x - cop.x) < p1.width + cop.width and 
+	   abs(p1.y - cop.y) < p1.height + cop.height)then
 		game_over = true
 	end
 end
 
 
 function _update()
-	control_player(p1)
+	control_player(p1, 1)
+	--control_player(p2, 2)
 	--foreach(characters, move_character)
-	if not game_over then
+	if welcome then
+		if btn(0) or btn(1) or btn(2) or btn(3) or btn(4) or btn(5) then
+			welcome = false
+		end
+	end
+	
+	if not game_over or not welcome then
 		move_player(p1)
-		move_cop(cop1)
-		check_bust(p1, cop1)
+		foreach(cops, move_cop)
+		foreach(cops, check_bust_p1)
 	end
 end
 
@@ -146,19 +169,21 @@ function draw_character(character)
 		character.frame %= character.frames
 		spr(1 + character.spr + character.frame, vx, vy, 1, 1, character.dx < 0)
 	end
-	
 end
 
 function _draw()
 	cls()
-	map(0, 0, 0, 0, 32, 32)
-	foreach(characters, draw_character)
-	
-	
+	if not welcome then
+		map(0, 0, 0, 0, 32, 32)
+		foreach(characters, draw_character)
+	else
+		--draw splash screen
+	end
 end
 
 --e.g. map(0,0, 20,20, 4,2)
 --	-> draws a 4x2 blocks of cels starting from 0,0 in the map, to the screen at 20,20
+
 
 __gfx__
 00000000666666665888888555555555666666666666666600000000000000000000000000000000000000000000000000000000000000000000000000000000
