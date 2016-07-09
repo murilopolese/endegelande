@@ -1,0 +1,13 @@
+{
+	"name": "ende-gelande",
+	"version": "0.0.1",
+	"description": "",
+	"scripts": {
+		"start": "./node_modules/.bin/http-server"
+	},
+	"dependencies": {
+		"http-server": "*"
+	},
+	"author": "Murilo Polese <murilopolese@gmail.com>",
+	"license": "WTFPL"
+}
